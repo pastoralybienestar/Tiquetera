@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiquetera de Descuentos Estudiantiles 3D</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Montserrat for bold, modern headers -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Fondo claro con imagen de textura y degradado sutil */
+            background-color: #f8fafc;
+            background-image: 
+                url('https://www.transparenttextures.com/patterns/diagonal-waves.png'),
+                radial-gradient(circle at top right, #fdf4ff, #e0e7ff, #f0fdf4);
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Formas abstractas de fondo claras y pastel */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.7;
+            z-index: -1;
+        }
+        .shape-1 { width: 400px; height: 400px; background: #fbcfe8; top: -100px; left: -100px; animation: floatShape 20s infinite alternate; }
+        .shape-2 { width: 500px; height: 500px; background: #bfdbfe; bottom: -150px; right: -150px; animation: floatShape 25s infinite alternate-reverse; }
+        .shape-3 { width: 300px; height: 300px; background: #fef08a; top: 40%; left: 30%; animation: floatShape 22s infinite alternate; }
+
+        @keyframes floatShape {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(50px, 50px) rotate(180deg); }
+        }
+
+        /* 
+           Rediseño de la forma del Ticket
+           Inspirado en "Captura de pantalla 2026-08-13 002526.png"
+           Bordes semicirculares en los laterales y patrón sutil de fondo.
+        */
+        .ticket-shape {
+            position: relative;
+            background-color: currentColor; /* El color se define por clase de Tailwind */
+            border-radius: 12px;
+            /* Usamos radial-gradient para crear los "mordiscos" circulares en los laterales y un borde punteado general */
+            -webkit-mask-image: radial-gradient(circle at 10px 10px, transparent 0, black 0);
+            mask-image: radial-gradient(circle at 10px 10px, transparent 0, black 0);
+            /* Sombra interna para dar volumen */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Los huecos (punch holes) que separan el ticket */
+        .ticket-cutout-top, .ticket-cutout-bottom {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border-radius: 50%;
+            right: 25%;
+            transform: translateX(50%);
+            z-index: 10;
+        }
+
+        .ticket-cutout-top {
+            top: -15px;
+            box-shadow: inset 0 -3px 5px rgba(0,0,0,0.1); /* Efecto 3D en el recorte */
+        }
+
+        .ticket-cutout-bottom {
+            bottom: -15px;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Línea punteada de separación */
+        .ticket-divider-line {
+            position: absolute;
+            top: 15px;
+            bottom: 15px;
+            right: 25%;
+            border-right: 3px dashed rgba(255, 255, 255, 0.5);
+            z-index: 10;
+        }
+
+        /* Bordes dentados (zig-zag) a los lados */
+        .ticket-edges {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            background-image: radial-gradient(circle at 0px 10px, transparent 10px, currentColor 11px);
+            background-size: 10px 20px;
+            background-repeat: repeat-y;
+        }
+        .edge-left { left: 0; background-position: left; transform: scaleX(-1); }
+        .edge-right { right: 0; background-position: left; }
+
+
+        /* Patrón geométrico sutil para el fondo del ticket (como en la imagen) */
+        .ticket-pattern {
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-position: center;
+        }
+
+        /* 
+           Animaciones Orgánicas para Emojis/Figuras 3D
+           Movimientos propios (respiración, levitación suave) sin ir de lado a lado
+        */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 10px 8px rgba(0,0,0,0.3)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 15px 12px rgba(0,0,0,0.2)); }
+        }
+        @keyframes gentle-levitate {
+            0%, 100% { transform: translateY(0); filter: drop-shadow(0 10px 8px rgba(0,0,0,0.3)); }
+            50% { transform: translateY(-8px); filter: drop-shadow(0 18px 10px rgba(0,0,0,0.15)); }
+        }
+        @keyframes soft-pulse {
+            0%, 100% { transform: scale(1) translateY(0); filter: drop-shadow(0 10px 8px rgba(0,0,0,0.3)); }
+            50% { transform: scale(1.04) translateY(-4px); filter: drop-shadow(0 14px 10px rgba(0,0,0,0.2)); }
+        }
+
+        /* Variaciones de animación para que se vean dinámicos y vivos */
+        .animate-emoji-1 { animation: breathe 3.5s ease-in-out infinite; display: inline-block; }
+        .animate-emoji-2 { animation: gentle-levitate 4s ease-in-out infinite 0.5s; display: inline-block; }
+        .animate-emoji-3 { animation: soft-pulse 3.8s ease-in-out infinite 1s; display: inline-block; }
+
+        /* Tipografía del Ticket */
+        .font-ticket {
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
+</head>
+<body class="relative">
+    <!-- Formas de fondo -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Datos de la tiquetera con TODA la información detallada
+        const ticketData = [
+            {
+                id: 1,
+                shortTitle: "Bancolombia",
+                subTitle: "Mastercard Joven",
+                title: "Tarjeta Mastercard Joven de Bancolombia",
+                provider: "Bancolombia",
+                description: "Una gran oportunidad de obtención de productos de manera fácil y accediendo a múltiples beneficios.\n\nAsesoría en creación de empresas, viajes académicos y boletería para eventos culturales.\n\nDescuentos y ofertas en comercios aliados como Invicta, HBO, School Center, Bodytech, Calzatodo, Laika, Flamingo y muchos más. Uso internacional (y nacional) para compras por internet en cualquier comercio.\n\nSiempre 2x1 en Cine Colombia y bono de descuento para la confitería todos los jueves.",
+                url: "https://www.bancolombia.com/personas/tarjetas-de-credito/mastercard/joven",
+                color: "bg-[#facc15]", 
+                textColor: "text-gray-900", 
+                emoji: "💳",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 2,
+                shortTitle: "Credencial",
+                subTitle: "Banco Occidente",
+                title: "Tarjeta Credencial Joven",
+                provider: "Banco de Occidente",
+                description: "Lo más importante es que puede ser tanto Visa como Mastercard y la puedes obtener fácilmente con las Universidades en Colombia que hay aliadas, este sí es una tarjeta de crédito que obtienes por ser estudiante universitario (institución acreditada).\n\nBono de bienvenida por $30.000 para cientos de comercios aliados.\nPreventas exclusivas para todos los eventos culturales, debido a que es una Tarjeta del Grupo Aval.\n\nCasillero Internacional para hacer grandes compras con Aliexpress, Amazon, eBay y otros con el OcciBox.\nAsistencia de viajes nacionales, internacionales, hogar y automóviles.",
+                url: "https://www.bancodeoccidente.com.co/banco-de-occidente/minisitios/juvenil/#modal",
+                color: "bg-[#3b82f6]",
+                textColor: "text-white",
+                emoji: "🏦",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 3,
+                shortTitle: "Spotify",
+                subTitle: "Premium 50%",
+                title: "Spotify Premium a mitad de precio",
+                provider: "Spotify",
+                description: "Normalmente este servicio tiene un costo de $14.900 mensuales; sin embargo, por ser estudiante universitario en Colombia tendrás un descuento del 50% y te quedará en $7.490.\n\nEn la aplicación te deberás acreditar con el correo electrónico institucional, después de ese paso tienes este beneficio por cuatro años.\n\nUna vez te gradúes, tienes 12 meses extra para usar el beneficio, posteriormente deberás pagar el precio neto de Spotify Premium.",
+                url: "https://www.spotify.com/co-es/student/",
+                color: "bg-[#10b981]", 
+                textColor: "text-white",
+                emoji: "🎧",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 4,
+                shortTitle: "Crehana",
+                subTitle: "Membresía",
+                title: "Membresía Premium de Crehana",
+                provider: "Crehana",
+                description: "Los cursos online son parte de nuestro ahora, por eso esta alternativa de aprendizaje tiene múltiples beneficios entre los que se encuentran una reducción en la toma de cursos y más de 500 programas y ocho maestrías para estudiantes activos en Colombia.\n\nEl costo normal de la suscripción está en $31.000 mensuales, si te suscribes a la Membresía Premium de Crehana el costo será de $18.750 para un valor anual de $225.000. Aprende de manera efectiva con Crehana bajo la modalidad estudiante.",
+                url: "https://www.crehana.com/membresias/estudiantil/",
+                color: "bg-[#8b5cf6]", 
+                textColor: "text-white",
+                emoji: "🎓",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 5,
+                shortTitle: "Apple Music",
+                subTitle: "Solo $6.500",
+                title: "Apple Music para estudiantes",
+                provider: "Apple",
+                description: "Al mejor estilo de Spotify, Apple Music tiene una oferta para estudiantes en Colombia para el periodo de prueba de dos meses, en vez de pagar $12.900 tendrás la posibilidad de obtener el servicio por solo $6.500.\n\nLa ventaja con Apple Music, es que te da un servicio más, puedes ver Apple TV con cientos de películas y series exclusivas.",
+                url: "https://support.apple.com/es-lamr/HT205928",
+                color: "bg-[#ec4899]", 
+                textColor: "text-white",
+                emoji: "🎵",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 6,
+                shortTitle: "ISIC",
+                subTitle: "Credencial",
+                title: "Credencial ISIC Internacional",
+                provider: "ISIC",
+                description: "ISIC es la agencia número uno en intercambio estudiantil por diferentes partes del mundo; está avalado por la Unesco por lo que es el sello de garantía para confiar en esta suscripción que solo te cuesta $35.000 y tiene una validez de 15 meses.\n\nEntre los beneficios que tienes son descuentos a parques temáticos, aerolíneas, hoteles y restaurantes, la única regla es ser estudiante activo en Colombia y tener entre 12 y 30 años.",
+                url: "https://isiccolombia.org/consigue-tu-isic/",
+                color: "bg-[#14b8a6]", 
+                textColor: "text-white",
+                emoji: "🌎",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 7,
+                shortTitle: "Evernote",
+                subTitle: "A solo $4.000",
+                title: "Evernote Premium",
+                provider: "Evernote",
+                description: "Evernote es la aplicación por excelencia para los estudiantes, ya que permite administrar tareas, hacer notas y recopilar archivos, entre otras actividades para esos estudiantes psicorrígidos.\n\nNormalmente la suscripción a su modo premium está en un poco más de $54.000, te ahorras más del 80% con tu carné de estudiante colombiano pagando solamente $4.000 por tener todas las herramientas Evernote desbloqueadas.",
+                url: "https://evernote.com/students",
+                color: "bg-[#047857]", 
+                textColor: "text-white",
+                emoji: "🐘",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 8,
+                shortTitle: "Lenovo",
+                subTitle: "Descuentos",
+                title: "Regreso a clases con Lenovo",
+                provider: "Lenovo",
+                description: "Cada inicio de año y aproximadamente hasta abril Lenovo saca todos los productos con diferentes descuentos para universitarios, pero también para estudiantes de colegio.\n\nExiste una categoría “estudiantes” donde ves los precios netos, si sigues hacia abajo encontrarás la suscripción con tu correo de estudiante donde aparecerán los descuentos mencionados.",
+                url: "https://lenovo-co.5nfc.net/EaQBKQ",
+                color: "bg-[#ef4444]", 
+                textColor: "text-white",
+                emoji: "💻",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 9,
+                shortTitle: "YouTube",
+                subTitle: "Mes Gratis",
+                title: "YouTube Premium",
+                provider: "YouTube",
+                description: "Siguiendo el ejemplo de sus competidores, Spotify y Apple Music, YouTube también ofrece descuentos por ser estudiante.\n\nLa oferta trata de un mes gratis en la suscripción premium, pasado este tiempo deberás pagar el precio regular de $10.490. Normalmente el periodo de prueba gratis es de solamente siete días.",
+                url: "https://www.youtube.com/premium/student",
+                color: "bg-[#dc2626]", 
+                textColor: "text-white",
+                emoji: "▶️",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 10,
+                shortTitle: "Adobe",
+                subTitle: "60% Dcto",
+                title: "Creative Cloud (Suite Adobe)",
+                provider: "Adobe",
+                description: "Si eres diseñador, publicista o simplemente te gusta crear contenido agradecerás activar tu correo estudiantil, pues con este obtendrás la Suite Creative Cloud con todas las aplicaciones que incluye con el 60% de descuento.\n\nPasas de pagar $79.830 a pagar solamente $30.140. ¿Ah, qué tal ese super descuento?",
+                url: "https://www.adobe.com/co/creativecloud/buy/students.html",
+                color: "bg-[#ea580c]", 
+                textColor: "text-white",
+                emoji: "🎨",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 11,
+                shortTitle: "FONTUR",
+                subTitle: "Tarjeta Joven",
+                title: "Tarjeta Joven de FONTUR",
+                provider: "Ministerio de Turismo",
+                description: "Avalado por el Ministerio de Comercio, Industria y Turismo colombiano y apoyado por FONTUR han creado para los personas entre 14 y 28 años la Tarjeta Joven, un acceso a cientos de promociones para viajar por todo Colombia a precios únicos.\n\nDescuentos en comida, viajes, transporte, hospedaje, parques y agencias de viajes. Una vez cumplas 29 años la tarjeta dejará de funcionar, úsala en comercios afiliados a FONTUR.",
+                url: "https://www.tarjetajoven.com/",
+                color: "bg-[#0ea5e9]",
+                textColor: "text-white",
+                emoji: "✈️",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 12,
+                shortTitle: "Samsung",
+                subTitle: "Hasta 50%",
+                title: "Descuentos Estudiantes",
+                provider: "Samsung",
+                description: "Tan fácil como comprar la mejor tecnología llegan los descuentos Samsung en Colombia, entra a la categoría estudiantes, ubica tu correo institucional y empieza a obtener beneficios exclusivos hasta con el 50% de descuento en cientos de productos.\n\nPor ejemplo, obtén un bono de $500.000 para obtener el Smartphone Samsung S23 de 512 gigas de memoria interna.",
+                url: "https://www.samsung.com/co/multistore/estudiantes_co/",
+                color: "bg-[#1e3a8a]", 
+                textColor: "text-white",
+                emoji: "📱",
+                animClass: "animate-emoji-3"
+            }
+        ];
+
+        const Ticket = ({ data, onClick }) => {
+            return (
+                <div 
+                    onClick={() => onClick(data)}
+                    className="group relative w-full h-40 sm:h-48 cursor-pointer transition-transform duration-300 hover:scale-[1.03]"
+                >
+                    {/* Sombra proyectada por todo el contenedor */}
+                    <div className="absolute inset-0 bg-black/10 rounded-xl blur-lg translate-y-3 scale-95 z-0 transition-all group-hover:bg-black/20 group-hover:translate-y-4"></div>
+                    
+                    {/* Contenedor del Ticket */}
+                    <div className={`relative h-full w-full ${data.color} ${data.textColor} rounded-2xl flex overflow-hidden z-10 ticket-shape border-2 border-white/20`}>
+                        
+                        {/* Patrón de fondo geométrico */}
+                        <div className="absolute inset-0 ticket-pattern pointer-events-none opacity-40"></div>
+
+                        {/* Bordes dentados (izq y der) simulando el corte del papel */}
+                        <div className={`ticket-edges edge-left text-${data.color.replace('bg-', '')}`}></div>
+                        <div className={`ticket-edges edge-right text-${data.color.replace('bg-', '')}`}></div>
+
+                        {/* Recortes de separación (arriba y abajo) */}
+                        <div className="ticket-cutout-top"></div>
+                        <div className="ticket-cutout-bottom"></div>
+                        
+                        {/* Línea punteada */}
+                        <div className="ticket-divider-line"></div>
+
+                        {/* Parte Izquierda (Texto Principal) - 75% ancho */}
+                        <div className="w-3/4 p-4 pl-8 flex flex-col justify-center items-start h-full relative z-20">
+                            <span className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1">
+                                {data.subTitle}
+                            </span>
+                            <h2 className="font-ticket text-3xl sm:text-4xl font-black uppercase leading-none drop-shadow-sm">
+                                {data.shortTitle}
+                            </h2>
+                        </div>
+
+                        {/* Parte Derecha (Emoji Animado) - 25% ancho */}
+                        <div className="w-1/4 flex flex-col items-center justify-center p-2 relative z-20">
+                             {/* Contenedor del emoji con animación focalizada */}
+                             <div className={`text-5xl sm:text-6xl ${data.animClass}`}>
+                                {data.emoji}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Modal = ({ isOpen, onClose, ticket }) => {
+            if (!isOpen || !ticket) return null;
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={onClose}>
+                    <div 
+                        className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform transition-all animate-[fadeIn_0.3s_ease-out]"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {/* Encabezado del Modal con el color del ticket */}
+                        <div className={`p-6 ${ticket.color} ${ticket.textColor} relative ticket-pattern`}>
+                            <button 
+                                onClick={onClose}
+                                className="absolute top-4 right-4 bg-black/20 hover:bg-black/40 text-white rounded-full p-1.5 transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                            <div className="flex flex-col items-center text-center mt-2">
+                                <div className={`text-6xl mb-4 ${ticket.animClass}`}>{ticket.emoji}</div>
+                                <p className="text-sm font-bold uppercase tracking-wider opacity-90">{ticket.provider}</p>
+                                <h3 className="font-ticket text-2xl font-black uppercase leading-tight mt-1">{ticket.title}</h3>
+                            </div>
+                        </div>
+
+                        {/* Cuerpo del Modal */}
+                        <div className="p-6">
+                            <div className="text-gray-700 mb-6 leading-relaxed text-base space-y-3 max-h-[40vh] overflow-y-auto pr-2">
+                                {ticket.description.split('\n').map((paragraph, idx) => (
+                                    paragraph.trim() !== '' && <p key={idx}>{paragraph}</p>
+                                ))}
+                            </div>
+                            
+                            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6">
+                                <p className="text-sm text-blue-800 flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                                    <span>Para redimir, asegúrate de utilizar tu <strong>correo institucional (.edu.co)</strong> en el sitio web del proveedor.</span>
+                                </p>
+                            </div>
+
+                            {/* Botón de Acción */}
+                            <a 
+                                href={ticket.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={`block w-full py-4 px-4 text-center text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 ${ticket.color}`}
+                                style={{ color: ticket.textColor === 'text-gray-900' ? '#111827' : 'white' }}
+                            >
+                                ¡Reclamar Descuento!
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [selectedTicket, setSelectedTicket] = useState(null);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+
+            // Animación CSS para el modal
+            useEffect(() => {
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+                        to { opacity: 1; transform: scale(1) translateY(0); }
+                    }
+                `;
+                document.head.appendChild(style);
+                return () => document.head.removeChild(style);
+            }, []);
+
+            const handleTicketClick = (ticket) => {
+                setSelectedTicket(ticket);
+                setIsModalOpen(true);
+            };
+
+            return (
+                <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 relative z-10">
+                    {/* Encabezado Mejorado */}
+                    <div className="max-w-6xl mx-auto mb-20 relative mt-4">
+                        <div className="relative overflow-hidden bg-white/50 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white p-8 sm:p-14 flex flex-col md:flex-row items-center justify-between gap-10">
+                            {/* Luces decorativas en el banner */}
+                            <div className="absolute -top-20 -right-20 w-64 h-64 bg-pink-300 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+                            <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-300 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+                            
+                            <div className="text-left flex-1 relative z-10">
+                                <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-indigo-100 text-indigo-800 text-sm font-bold tracking-widest mb-6 uppercase shadow-sm">
+                                    <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                                    Beneficios Exclusivos
+                                </span>
+                                <h1 className="font-ticket text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 drop-shadow-sm mb-4 uppercase tracking-tighter leading-[0.9]">
+                                    Tiquetera <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
+                                        Estudiantil
+                                    </span>
+                                </h1>
+                                <p className="text-lg md:text-xl text-gray-700 font-medium max-w-xl leading-relaxed">
+                                    ¡Demuestra que ser estudiante paga! Desbloquea descuentos increíbles usando tu correo institucional <strong className="text-gray-900 bg-yellow-200/50 px-1 rounded">.edu.co</strong>.
+                                </p>
+                            </div>
+                            
+                            {/* Ilustración / Emoji del banner */}
+                            <div className="relative z-10 flex-shrink-0 animate-emoji-2 hidden md:block">
+                                <div className="text-[9rem] drop-shadow-2xl">🎓</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cuadrícula de Tickets - Ajustada a max-w-[450px] para alargarlos */}
+                    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-y-12 gap-x-10">
+                        {ticketData.map(ticket => (
+                            <div key={ticket.id} className="flex justify-center">
+                                <div className="w-full max-w-[450px]"> 
+                                    <Ticket 
+                                        data={ticket} 
+                                        onClick={handleTicketClick} 
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Pie de página con mensaje inspirador */}
+                    <div className="max-w-4xl mx-auto text-center mt-24 pb-12 text-gray-800 font-medium px-4 relative z-10">
+                        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl border border-white mb-6 transform transition hover:scale-[1.01]">
+                            <p className="text-xl sm:text-2xl mb-4 text-gray-900 leading-snug">
+                                Que ser estudiante no solo sea un sacrificio, <br className="hidden sm:block"/>
+                                <strong className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 font-black text-2xl sm:text-3xl">¡Sácale provecho a tu correo y carné!</strong>
+                            </p>
+                            <p className="text-base sm:text-lg opacity-80 text-gray-700 max-w-2xl mx-auto">
+                                Cada semestre no es solo un gasto, también es la llave para acceder a cientos de beneficios por todo el país y el mundo.
+                            </p>
+                        </div>
+                        <p className="text-sm opacity-60 font-semibold tracking-wide uppercase">Haz clic en cualquier ticket para ver los detalles completos.</p>
+                    </div>
+
+                    {/* Modal */}
+                    <Modal 
+                        isOpen={isModalOpen} 
+                        onClose={() => setIsModalOpen(false)} 
+                        ticket={selectedTicket} 
+                    />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
