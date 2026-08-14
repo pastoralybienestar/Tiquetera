@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
     <title>Tiquetera de Descuentos Estudiantiles 3D</title>
     
     <!-- React & ReactDOM -->
@@ -20,12 +19,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            /* Fuerza el modo claro para que navegadores móviles no inviertan colores a negro */
-            color-scheme: light;
-            --organic-ease: cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f8fafc;
@@ -38,33 +31,30 @@
             overflow-x: hidden;
         }
 
-        /* Formas de fondo abstractas corregidas (Evita pantalla negra por colapso de GPU) */
+        /* Formas de fondo abstractas */
         .bg-shape {
             position: fixed;
             border-radius: 50%;
-            /* Se reduce el blur de 100px a 60px y se añade webkit para evitar crasheos en iOS/Android */
-            filter: blur(60px);
-            -webkit-filter: blur(60px);
-            opacity: 0.6;
+            filter: blur(100px);
+            opacity: 0.7;
             z-index: -1;
-            /* Aceleración por hardware para móviles */
-            transform: translateZ(0); 
-            will-change: transform;
         }
         .shape-1 { width: 400px; height: 400px; background: #fbcfe8; top: -100px; left: -100px; animation: floatShape 20s infinite alternate; }
         .shape-2 { width: 500px; height: 500px; background: #bfdbfe; bottom: -150px; right: -150px; animation: floatShape 25s infinite alternate-reverse; }
         .shape-3 { width: 300px; height: 300px; background: #fef08a; top: 40%; left: 30%; animation: floatShape 22s infinite alternate; }
 
         @keyframes floatShape {
-            0% { transform: translate3d(0, 0, 0) rotate(0deg); }
-            100% { transform: translate3d(50px, 50px, 0) rotate(180deg); }
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(50px, 50px) rotate(180deg); }
         }
 
-        /* Diseño del Ticket base corregido */
+        /* Diseño del Ticket base */
         .ticket-shape {
             position: relative;
+            background-color: currentColor;
             border-radius: 12px;
-            /* Se eliminaron background-color: currentColor y mask-image que causaban un cuadro negro */
+            -webkit-mask-image: radial-gradient(circle at 10px 10px, transparent 0, black 0);
+            mask-image: radial-gradient(circle at 10px 10px, transparent 0, black 0);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 10px 25px -5px rgba(0, 0, 0, 0.2);
             transform-style: preserve-3d;
         }
@@ -107,8 +97,13 @@
         /* Patrón geométrico */
         .ticket-pattern {
             background-image: 
-                url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+                url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
             background-position: center;
+        }
+
+        /* Animaciones Orgánicas y Fluidas */
+        :root {
+            --organic-ease: cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         @keyframes breathe-natural {
@@ -138,40 +133,65 @@
         }
 
         /* Scrollbar Creativo (General y Modal) */
-        ::-webkit-scrollbar { width: 14px; }
-        ::-webkit-scrollbar-track { background: #f8fafc; border-left: 2px dashed #e2e8f0; }
+        ::-webkit-scrollbar {
+            width: 14px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-left: 2px dashed #e2e8f0; 
+        }
+
         ::-webkit-scrollbar-thumb {
             background-color: #a855f7;
-            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.25) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.25) 75%, transparent 75%, transparent);
+            background-image: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.25) 25%, 
+                transparent 25%, 
+                transparent 50%, 
+                rgba(255, 255, 255, 0.25) 50%, 
+                rgba(255, 255, 255, 0.25) 75%, 
+                transparent 75%, 
+                transparent
+            );
             background-size: 16px 16px;
             border-radius: 12px;
             border: 3px solid #f8fafc;
             background-clip: padding-box;
             transition: background-color 0.3s;
         }
-        ::-webkit-scrollbar-thumb:hover { background-color: #ec4899; }
-        .modal-scroll::-webkit-scrollbar { width: 8px; }
-        .modal-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); border-radius: 8px; border-left: none; }
-        .modal-scroll::-webkit-scrollbar-thumb { border: 2px solid white; border-radius: 8px; }
 
-        * { scrollbar-width: thin; scrollbar-color: #a855f7 transparent; }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #ec4899; 
+        }
+
+        /* Scrollbar específico para el interior del modal */
+        .modal-scroll::-webkit-scrollbar {
+            width: 8px; /* Más delgado para la modal */
+        }
+        .modal-scroll::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.03);
+            border-radius: 8px;
+            border-left: none;
+        }
+        .modal-scroll::-webkit-scrollbar-thumb {
+            border: 2px solid white; 
+            border-radius: 8px;
+        }
+
+        /* Firefox fallback */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #a855f7 transparent;
+        }
     </style>
 </head>
-<body class="relative text-gray-900">
+<body class="relative">
     <!-- Formas de fondo -->
     <div class="bg-shape shape-1"></div>
     <div class="bg-shape shape-2"></div>
     <div class="bg-shape shape-3"></div>
 
-    <div id="root">
-        <!-- Pantalla de carga incorporada: Si el internet es lento y no carga React, el usuario verá esto en lugar de una pantalla vacía -->
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; text-align: center; padding: 20px;">
-            <div style="width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
-            <h2 style="font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; color: #1f2937;">Cargando Tiquetera...</h2>
-            <p style="font-family: 'Poppins', sans-serif; color: #6b7280; max-width: 300px; margin-top: 10px;">Si esto tarda demasiado, por favor desactiva tu bloqueador de anuncios y recarga.</p>
-            <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-        </div>
-    </div>
+    <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
@@ -202,31 +222,245 @@
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.1);
             } catch (error) {
-                // Silently fail if audio is not supported
+                console.warn("Audio interaction requires user gesture first.");
             }
         };
 
         const ticketData = [
-            { id: 1, shortTitle: "Bancolombia", subTitle: "Mastercard Joven", title: "Tarjeta Mastercard Joven", provider: "Bancolombia", description: "Una gran oportunidad de obtención de productos de manera fácil y accediendo a múltiples beneficios.\n\nAsesoría en creación de empresas, viajes académicos y boletería para eventos culturales.\n\nDescuentos y ofertas en comercios aliados como Invicta, HBO, School Center, Bodytech, Calzatodo, Laika, Flamingo y muchos más. Uso internacional (y nacional) para compras por internet en cualquier comercio.\n\nSiempre 2x1 en Cine Colombia y bono de descuento para la confitería todos los jueves.", url: "https://www.bancolombia.com/personas/tarjetas-de-credito/mastercard/joven", color: "bg-[#facc15]", textColor: "text-gray-900", emoji: "💳", animClass: "animate-emoji-1" },
-            { id: 2, shortTitle: "Credencial", subTitle: "Banco Occidente", title: "Tarjeta Credencial Joven", provider: "Banco de Occidente", description: "A diferencia de otras opciones, esta tarjeta de crédito está diseñada exclusivamente para estudiantes universitarios (de instituciones acreditadas) y la puedes obtener fácilmente gracias a las alianzas universitarias. Puede ser Visa o Mastercard.\n\nBono de bienvenida por $30.000 para cientos de comercios aliados.\nPreventas exclusivas para todos los eventos culturales, debido a que es una Tarjeta del Grupo Aval.\n\nCasillero Internacional para hacer grandes compras con Aliexpress, Amazon, eBay y otros con el OcciBox.\nAsistencia de viajes nacionales, internacionales, hogar y automóviles.", url: "https://www.bancodeoccidente.com.co/banco-de-occidente/minisitios/juvenil/#modal", color: "bg-[#3b82f6]", textColor: "text-white", emoji: "🏦", animClass: "animate-emoji-2" },
-            { id: 3, shortTitle: "Spotify", subTitle: "Premium 50%", title: "Spotify a mitad de precio", provider: "Spotify", description: "Normalmente este servicio tiene un costo de $14.900 mensuales; sin embargo, por ser estudiante universitario en Colombia tendrás un descuento del 50% y te quedará en $7.490.\n\nEn la aplicación te deberás acreditar con el correo electrónico institucional, después de ese paso tienes este beneficio por cuatro años.\n\nUna vez te gradúes, tienes 12 meses extra para usar el beneficio, posteriormente deberás pagar el precio neto de Spotify Premium.", url: "https://www.spotify.com/co-es/student/", color: "bg-[#10b981]", textColor: "text-white", emoji: "🎧", animClass: "animate-emoji-3" },
-            { id: 4, shortTitle: "Crehana", subTitle: "Membresía", title: "Membresía Premium", provider: "Crehana", description: "El aprendizaje online es fundamental hoy en día. Con esta alternativa obtendrás tarifas preferenciales para acceder a más de 500 programas y ocho maestrías exclusivas para estudiantes activos en Colombia.\n\nEl costo normal de la suscripción está en $31.000 mensuales, si te suscribes a la Membresía Premium de Crehana el costo será de $18.750 para un valor anual de $225.000. Aprende de manera efectiva con Crehana bajo la modalidad estudiante.", url: "https://www.crehana.com/membresias/estudiantil/", color: "bg-[#8b5cf6]", textColor: "text-white", emoji: "🎓", animClass: "animate-emoji-1" },
-            { id: 5, shortTitle: "Apple Music", subTitle: "Solo $6.500", title: "Apple Music Estudiantes", provider: "Apple", description: "Al mejor estilo de Spotify, Apple Music tiene una oferta para estudiantes en Colombia para el periodo de prueba de dos meses, en vez de pagar $12.900 tendrás la posibilidad de obtener el servicio por solo $6.500.\n\nLa ventaja con Apple Music, es que te da un servicio más, puedes ver Apple TV con cientos de películas y series exclusivas.", url: "https://support.apple.com/es-lamr/HT205928", color: "bg-[#ec4899]", textColor: "text-white", emoji: "🎵", animClass: "animate-emoji-2" },
-            { id: 6, shortTitle: "ISIC", subTitle: "Credencial", title: "Credencial Internacional", provider: "ISIC", description: "ISIC es la credencial número uno en intercambio estudiantil a nivel mundial. Está avalada por la UNESCO, lo que garantiza la calidad de esta suscripción que tiene un costo de solo $35.000 y una validez de 15 meses.\n\nEntre los beneficios que tienes son descuentos a parques temáticos, aerolíneas, hoteles y restaurantes, la única regla es ser estudiante activo en Colombia y tener entre 12 y 30 años.", url: "https://isiccolombia.org/consigue-tu-isic/", color: "bg-[#14b8a6]", textColor: "text-white", emoji: "🌎", animClass: "animate-emoji-3" },
-            { id: 7, shortTitle: "Evernote", subTitle: "A solo $4.000", title: "Evernote Premium", provider: "Evernote", description: "Evernote es la aplicación por excelencia para los estudiantes, ya que permite administrar tareas, hacer notas y recopilar archivos, entre otras actividades, ideal para aquellos estudiantes que aman la organización perfecta y la productividad.\n\nNormalmente la suscripción a su modo premium está en un poco más de $54.000, te ahorras más del 80% con tu carné de estudiante colombiano pagando solamente $4.000 por tener todas las herramientas Evernote desbloqueadas.", url: "https://evernote.com/students", color: "bg-[#047857]", textColor: "text-white", emoji: "🐘", animClass: "animate-emoji-1" },
-            { id: 8, shortTitle: "Lenovo", subTitle: "Descuentos", title: "Regreso a clases Lenovo", provider: "Lenovo", description: "Cada inicio de año y aproximadamente hasta abril Lenovo saca todos los productos con diferentes descuentos para universitarios, pero también para estudiantes de colegio.\n\nExiste una categoría “estudiantes” donde ves los precios netos, si sigues hacia abajo encontrarás la suscripción con tu correo de estudiante donde aparecerán los descuentos mencionados.", url: "https://lenovo-co.5nfc.net/EaQBKQ", color: "bg-[#ef4444]", textColor: "text-white", emoji: "💻", animClass: "animate-emoji-2" },
-            { id: 9, shortTitle: "YouTube", subTitle: "Mes Gratis", title: "YouTube Premium", provider: "YouTube", description: "Siguiendo el ejemplo de sus competidores, Spotify y Apple Music, YouTube también ofrece descuentos por ser estudiante.\n\nLa oferta trata de un mes gratis en la suscripción premium, pasado este tiempo deberás pagar el precio regular de $10.490. Normalmente el periodo de prueba gratis es de solamente siete días.", url: "https://www.youtube.com/premium/student", color: "bg-[#dc2626]", textColor: "text-white", emoji: "▶️", animClass: "animate-emoji-3" },
-            { id: 10, shortTitle: "Adobe", subTitle: "60% Dcto", title: "Creative Cloud Adobe", provider: "Adobe", description: "Si eres diseñador, publicista o simplemente te gusta crear contenido agradecerás activar tu correo estudiantil, pues con este obtendrás la Suite Creative Cloud con todas las aplicaciones que incluye con el 60% de descuento.\n\nPasas de pagar $79.830 a pagar solamente $30.140. ¿Ah, qué tal ese super descuento?", url: "https://www.adobe.com/co/creativecloud/buy/students.html", color: "bg-[#ea580c]", textColor: "text-white", emoji: "🎨", animClass: "animate-emoji-1" },
-            { id: 11, shortTitle: "FONTUR", subTitle: "Tarjeta Joven", title: "Tarjeta Joven de FONTUR", provider: "Min. de Turismo", description: "El Ministerio de Comercio, Industria y Turismo, con el apoyo de FONTUR, ha creado la Tarjeta Joven para personas entre 14 y 28 años. Esta credencial te brinda acceso a cientos de promociones para viajar por toda Colombia a precios únicos.\n\nDescuentos en comida, viajes, transporte, hospedaje, parques y agencias de viajes. Una vez cumplas 29 años la tarjeta dejará de funcionar, úsala en comercios afiliados a FONTUR.", url: "https://www.tarjetajoven.com/", color: "bg-[#0ea5e9]", textColor: "text-white", emoji: "✈️", animClass: "animate-emoji-2" },
-            { id: 12, shortTitle: "Samsung", subTitle: "Hasta 50%", title: "Descuentos Estudiantes", provider: "Samsung", description: "Tan fácil como comprar la mejor tecnología llegan los descuentos Samsung en Colombia, entra a la categoría estudiantes, ubica tu correo institucional y empieza a obtener beneficios exclusivos hasta con el 50% de descuento en cientos de productos.\n\nPor ejemplo, obtén un bono de $500.000 para obtener el Smartphone Samsung S23 de 512 gigas de memoria interna.", url: "https://www.samsung.com/co/multistore/estudiantes_co/", color: "bg-[#1e3a8a]", textColor: "text-white", emoji: "📱", animClass: "animate-emoji-3" },
-            { id: 13, shortTitle: "GitHub", subTitle: "Student Pack", title: "GitHub Developer Pack", provider: "GitHub Education", description: "Si eres estudiante de tecnología, ingeniería o sistemas, este es el santo grial. GitHub ofrece su 'Developer Pack' completamente gratis verificando tu correo institucional o carné.\n\nIncluye GitHub Pro gratis mientras seas estudiante, $200 USD en créditos para MongoDB Atlas, acceso a servicios de Microsoft Azure, Name.com (dominio gratis por un año), licencias de JetBrains, Canva Pro, y acceso a más de 80 herramientas exclusivas de desarrollo.\n\nUn paquete valorado en miles de dólares, diseñado para que construyas tu portafolio profesional sin costo.", url: "https://education.github.com/pack", color: "bg-[#1f2937]", textColor: "text-white", emoji: "👾", animClass: "animate-emoji-1" },
-            { id: 14, shortTitle: "Microsoft", subTitle: "50% Dcto", title: "Microsoft 365 Personal", provider: "Microsoft", description: "La suite ofimática más importante del mundo a mitad de precio. Los estudiantes universitarios ahorran un 50% en Microsoft 365 Personal.\n\nEste beneficio incluye Word, Excel, PowerPoint, 1 TB (1000 GB) de almacenamiento seguro en la nube con OneDrive, y lo más importante: acceso a herramientas avanzadas de Inteligencia Artificial como Microsoft Copilot para ayudarte con redacción, análisis de datos y creación de presentaciones.\n\nSolo necesitas ingresar tu correo .edu.co para verificar tu estado académico.", url: "https://www.microsoft.com/es-co/microsoft-365/college-student-pricing", color: "bg-[#0ea5e9]", textColor: "text-white", emoji: "🪟", animClass: "animate-emoji-2" },
-            { id: 15, shortTitle: "Autodesk", subTitle: "Software Gratis", title: "Licencias Educativas", provider: "Autodesk", description: "Si estudias ingeniería, arquitectura o diseño 3D, esto te interesa. Autodesk ofrece acceso educativo gratuito por un año (renovable mientras seas estudiante) a su catálogo completo de software.\n\nEsto incluye licencias completas y originales de AutoCAD, Revit, Maya, 3ds Max, Fusion 360 y más de 40 programas profesionales.\n\nSolo debes registrarte en la comunidad educativa de Autodesk con tu correo institucional y subir una foto de tu carné para verificar tu estado académico.", url: "https://www.autodesk.com/education/edu-software/", color: "bg-[#0284c7]", textColor: "text-white", emoji: "🏗️", animClass: "animate-emoji-3" },
-            { id: 16, shortTitle: "Figma", subTitle: "Plan Pro Gratis", title: "Figma para Educación", provider: "Figma", description: "La herramienta líder a nivel mundial en diseño de interfaces de usuario (UI), experiencia de usuario (UX) y prototipado colaborativo es completamente gratuita para estudiantes.\n\nAl verificar tu correo .edu.co, obtendrás una actualización automática al Plan Profesional de Figma (que normalmente cuesta 12 dólares mensuales) sin ningún costo. Esto te permite tener proyectos ilimitados, historial de versiones infinito y bibliotecas de equipo privadas.\n\nIdeal para trabajos en grupo, diseño de software y presentaciones interactivas.", url: "https://www.figma.com/education/", color: "bg-[#f43f5e]", textColor: "text-white", emoji: "🖌️", animClass: "animate-emoji-1" },
-            { id: 17, shortTitle: "MUBI", subTitle: "Cine con 60% Dcto", title: "MUBI Estudiantes", provider: "MUBI", description: "Para los amantes del séptimo arte y estudiantes de comunicación o audiovisuales, MUBI es una plataforma de streaming curada que ofrece películas independientes, de culto, clásicas y galardonadas en festivales de todo el mundo.\n\nComo estudiante universitario, puedes acceder a su plan especial con un descuento superior al 60%. Pagarás una tarifa muy reducida para disfrutar de una cartelera que cambia constantemente, sin anuncios y con la posibilidad de descargar películas para ver offline.\n\nLa suscripción requiere confirmar tu correo institucional.", url: "https://mubi.com/es/student", color: "bg-[#312e81]", textColor: "text-white", emoji: "🎬", animClass: "animate-emoji-2" },
-            { id: 18, shortTitle: "Tableau", subTitle: "Licencia Gratis", title: "Tableau for Students", provider: "Salesforce", description: "El análisis de datos es una de las habilidades más demandadas en el mercado laboral. Tableau, la herramienta líder mundial en inteligencia de negocios (Business Intelligence), ofrece su versión Desktop profesional y material de e-learning completamente gratis por un año para estudiantes universitarios.\n\nEste beneficio es renovable mientras sigas estudiando, te ahorra cientos de dólares anuales y te permite crear visualizaciones y dashboards interactivos e impactantes para tus trabajos, investigaciones o tesis de grado.\n\nSolo necesitas validar tu estado académico con tu correo .edu.co.", url: "https://www.tableau.com/academic/students", color: "bg-[#0f172a]", textColor: "text-white", emoji: "📈", animClass: "animate-emoji-3" },
-            { id: 19, shortTitle: "JetBrains", subTitle: "Licencias Gratis", title: "Pack JetBrains", provider: "JetBrains", description: "Si ves materias de programación o estudias alguna ingeniería afín a la tecnología, esta es una herramienta obligatoria. JetBrains ofrece acceso gratuito a todos sus entornos de desarrollo (IDE) profesionales, como IntelliJ IDEA (Java), PyCharm (Python) y WebStorm (JavaScript).\n\nEstas licencias profesionales cuestan normalmente cientos de dólares al año, pero son 100% gratuitas mientras estés matriculado en la universidad.\n\nRegístrate con tu correo .edu.co y renueva tu acceso cada año sin costo.", url: "https://www.jetbrains.com/community/education/", color: "bg-[#27272a]", textColor: "text-white", emoji: "👨‍💻", animClass: "animate-emoji-2" },
-            { id: 20, shortTitle: "Cultura", subTitle: "Descuentos físicos", title: "Museos y Cultura", provider: "Entidades Culturales", description: "¡No todo es digital! Tu carné físico o virtual de la universidad es una llave de oro para la cultura y el entretenimiento presencial en Colombia.\n\nInstituciones icónicas como el Parque Explora, el Museo de Antioquia y el Jardín Botánico (en Medellín), o el MAMBO y Maloka (en Bogotá) ofrecen desde un 30% de descuento hasta entrada totalmente gratuita para estudiantes de pregrado.\n\nSolo debes presentar tu carné estudiantil vigente y tu documento de identidad en las taquillas. ¡Aprovecha para turistear y aprender a bajo costo!", url: "https://museoscolombianos.gov.co/", color: "bg-[#fbbf24]", textColor: "text-gray-900", emoji: "🏛️", animClass: "animate-emoji-1" }
+            {
+                id: 1,
+                shortTitle: "Bancolombia",
+                subTitle: "Mastercard Joven",
+                title: "Tarjeta Mastercard Joven",
+                provider: "Bancolombia",
+                description: "Una gran oportunidad de obtención de productos de manera fácil y accediendo a múltiples beneficios.\n\nAsesoría en creación de empresas, viajes académicos y boletería para eventos culturales.\n\nDescuentos y ofertas en comercios aliados como Invicta, HBO, School Center, Bodytech, Calzatodo, Laika, Flamingo y muchos más. Uso internacional (y nacional) para compras por internet en cualquier comercio.\n\nSiempre 2x1 en Cine Colombia y bono de descuento para la confitería todos los jueves.",
+                url: "https://www.bancolombia.com/personas/tarjetas-de-credito/mastercard/joven",
+                color: "bg-[#facc15]", 
+                textColor: "text-gray-900", 
+                emoji: "💳",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 3,
+                shortTitle: "Spotify",
+                subTitle: "Premium 50%",
+                title: "Spotify a mitad de precio",
+                provider: "Spotify",
+                description: "Normalmente este servicio tiene un costo de $14.900 mensuales; sin embargo, por ser estudiante universitario en Colombia tendrás un descuento del 50% y te quedará en $7.490.\n\nEn la aplicación te deberás acreditar con el correo electrónico institucional, después de ese paso tienes este beneficio por cuatro años.\n\nUna vez te gradúes, tienes 12 meses extra para usar el beneficio, posteriormente deberás pagar el precio neto de Spotify Premium.",
+                url: "https://www.spotify.com/co-es/student/",
+                color: "bg-[#10b981]", 
+                textColor: "text-white",
+                emoji: "🎧",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 4,
+                shortTitle: "Crehana",
+                subTitle: "Membresía",
+                title: "Membresía Premium",
+                provider: "Crehana",
+                description: "El aprendizaje online es fundamental hoy en día. Con esta alternativa obtendrás tarifas preferenciales para acceder a más de 500 programas y ocho maestrías exclusivas para estudiantes activos en Colombia.\n\nEl costo normal de la suscripción está en $31.000 mensuales, si te suscribes a la Membresía Premium de Crehana el costo será de $18.750 para un valor anual de $225.000. Aprende de manera efectiva con Crehana bajo la modalidad estudiante.",
+                url: "https://www.crehana.com/membresias/estudiantil/",
+                color: "bg-[#8b5cf6]", 
+                textColor: "text-white",
+                emoji: "🎓",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 5,
+                shortTitle: "Apple Music",
+                subTitle: "Solo $6.500",
+                title: "Apple Music Estudiantes",
+                provider: "Apple",
+                description: "Al mejor estilo de Spotify, Apple Music tiene una oferta para estudiantes en Colombia para el periodo de prueba de dos meses, en vez de pagar $12.900 tendrás la posibilidad de obtener el servicio por solo $6.500.\n\nLa ventaja con Apple Music, es que te da un servicio más, puedes ver Apple TV con cientos de películas y series exclusivas.",
+                url: "https://support.apple.com/es-lamr/HT205928",
+                color: "bg-[#ec4899]", 
+                textColor: "text-white",
+                emoji: "🎵",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 6,
+                shortTitle: "ISIC",
+                subTitle: "Credencial",
+                title: "Credencial Internacional",
+                provider: "ISIC",
+                description: "ISIC es la credencial número uno en intercambio estudiantil a nivel mundial. Está avalada por la UNESCO, lo que garantiza la calidad de esta suscripción que tiene un costo de solo $35.000 y una validez de 15 meses.\n\nEntre los beneficios que tienes son descuentos a parques temáticos, aerolíneas, hoteles y restaurantes, la única regla es ser estudiante activo en Colombia y tener entre 12 y 30 años.",
+                url: "https://isiccolombia.org/consigue-tu-isic/",
+                color: "bg-[#14b8a6]", 
+                textColor: "text-white",
+                emoji: "🌎",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 7,
+                shortTitle: "Evernote",
+                subTitle: "A solo $4.000",
+                title: "Evernote Premium",
+                provider: "Evernote",
+                description: "Evernote es la aplicación por excelencia para los estudiantes, ya que permite administrar tareas, hacer notas y recopilar archivos, entre otras actividades, ideal para aquellos estudiantes que aman la organización perfecta y la productividad.\n\nNormalmente la suscripción a su modo premium está en un poco más de $54.000, te ahorras más del 80% con tu carné de estudiante colombiano pagando solamente $4.000 por tener todas las herramientas Evernote desbloqueadas.",
+                url: "https://evernote.com/students",
+                color: "bg-[#047857]", 
+                textColor: "text-white",
+                emoji: "🐘",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 8,
+                shortTitle: "Lenovo",
+                subTitle: "Descuentos",
+                title: "Regreso a clases Lenovo",
+                provider: "Lenovo",
+                description: "Cada inicio de año y aproximadamente hasta abril Lenovo saca todos los productos con diferentes descuentos para universitarios, pero también para estudiantes de colegio.\n\nExiste una categoría “estudiantes” donde ves los precios netos, si sigues hacia abajo encontrarás la suscripción con tu correo de estudiante donde aparecerán los descuentos mencionados.",
+                url: "https://lenovo-co.5nfc.net/EaQBKQ",
+                color: "bg-[#ef4444]", 
+                textColor: "text-white",
+                emoji: "💻",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 9,
+                shortTitle: "YouTube",
+                subTitle: "Mes Gratis",
+                title: "YouTube Premium",
+                provider: "YouTube",
+                description: "Siguiendo el ejemplo de sus competidores, Spotify y Apple Music, YouTube también ofrece descuentos por ser estudiante.\n\nLa oferta trata de un mes gratis en la suscripción premium, pasado este tiempo deberás pagar el precio regular de $10.490. Normalmente el periodo de prueba gratis es de solamente siete días.",
+                url: "https://www.youtube.com/premium/student",
+                color: "bg-[#dc2626]", 
+                textColor: "text-white",
+                emoji: "▶️",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 10,
+                shortTitle: "Adobe",
+                subTitle: "60% Dcto",
+                title: "Creative Cloud Adobe",
+                provider: "Adobe",
+                description: "Si eres diseñador, publicista o simplemente te gusta crear contenido agradecerás activar tu correo estudiantil, pues con este obtendrás la Suite Creative Cloud con todas las aplicaciones que incluye con el 60% de descuento.\n\nPasas de pagar $79.830 a pagar solamente $30.140. ¿Ah, qué tal ese super descuento?",
+                url: "https://www.adobe.com/co/creativecloud/buy/students.html",
+                color: "bg-[#ea580c]", 
+                textColor: "text-white",
+                emoji: "🎨",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 11,
+                shortTitle: "FONTUR",
+                subTitle: "Tarjeta Joven",
+                title: "Tarjeta Joven de FONTUR",
+                provider: "Min. de Turismo",
+                description: "El Ministerio de Comercio, Industria y Turismo, con el apoyo de FONTUR, ha creado la Tarjeta Joven para personas entre 14 y 28 años. Esta credencial te brinda acceso a cientos de promociones para viajar por toda Colombia a precios únicos.\n\nDescuentos en comida, viajes, transporte, hospedaje, parques y agencias de viajes. Una vez cumplas 29 años la tarjeta dejará de funcionar, úsala en comercios afiliados a FONTUR.",
+                url: "https://www.tarjetajoven.com/",
+                color: "bg-[#0ea5e9]",
+                textColor: "text-white",
+                emoji: "✈️",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 12,
+                shortTitle: "Samsung",
+                subTitle: "Hasta 50%",
+                title: "Descuentos Estudiantes",
+                provider: "Samsung",
+                description: "Tan fácil como comprar la mejor tecnología llegan los descuentos Samsung en Colombia, entra a la categoría estudiantes, ubica tu correo institucional y empieza a obtener beneficios exclusivos hasta con el 50% de descuento en cientos de productos.\n\nPor ejemplo, obtén un bono de $500.000 para obtener el Smartphone Samsung S23 de 512 gigas de memoria interna.",
+                url: "https://www.samsung.com/co/multistore/estudiantes_co/",
+                color: "bg-[#1e3a8a]", 
+                textColor: "text-white",
+                emoji: "📱",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 13,
+                shortTitle: "GitHub",
+                subTitle: "Student Pack",
+                title: "GitHub Developer Pack",
+                provider: "GitHub Education",
+                description: "Si eres estudiante de tecnología, ingeniería o sistemas, este es el santo grial. GitHub ofrece su 'Developer Pack' completamente gratis verificando tu correo institucional o carné.\n\nIncluye GitHub Pro gratis mientras seas estudiante, $200 USD en créditos para MongoDB Atlas, acceso a servicios de Microsoft Azure, Name.com (dominio gratis por un año), licencias de JetBrains, Canva Pro, y acceso a más de 80 herramientas exclusivas de desarrollo.\n\nUn paquete valorado en miles de dólares, diseñado para que construyas tu portafolio profesional sin costo.",
+                url: "https://education.github.com/pack",
+                color: "bg-[#1f2937]", 
+                textColor: "text-white",
+                emoji: "👾",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 14,
+                shortTitle: "Microsoft",
+                subTitle: "50% Dcto",
+                title: "Microsoft 365 Personal",
+                provider: "Microsoft",
+                description: "La suite ofimática más importante del mundo a mitad de precio. Los estudiantes universitarios ahorran un 50% en Microsoft 365 Personal.\n\nEste beneficio incluye Word, Excel, PowerPoint, 1 TB (1000 GB) de almacenamiento seguro en la nube con OneDrive, y lo más importante: acceso a herramientas avanzadas de Inteligencia Artificial como Microsoft Copilot para ayudarte con redacción, análisis de datos y creación de presentaciones.\n\nSolo necesitas ingresar tu correo .edu.co para verificar tu estado académico.",
+                url: "https://www.microsoft.com/es-co/microsoft-365/college-student-pricing",
+                color: "bg-[#0ea5e9]", 
+                textColor: "text-white",
+                emoji: "🪟",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 15,
+                shortTitle: "Autodesk",
+                subTitle: "Software Gratis",
+                title: "Licencias Educativas",
+                provider: "Autodesk",
+                description: "Si estudias ingeniería, arquitectura o diseño 3D, esto te interesa. Autodesk ofrece acceso educativo gratuito por un año (renovable mientras seas estudiante) a su catálogo completo de software.\n\nEsto incluye licencias completas y originales de AutoCAD, Revit, Maya, 3ds Max, Fusion 360 y más de 40 programas profesionales.\n\nSolo debes registrarte en la comunidad educativa de Autodesk con tu correo institucional y subir una foto de tu carné para verificar tu estado académico.",
+                url: "https://www.autodesk.com/education/edu-software/",
+                color: "bg-[#0284c7]", 
+                textColor: "text-white",
+                emoji: "🏗️",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 16,
+                shortTitle: "Figma",
+                subTitle: "Plan Pro Gratis",
+                title: "Figma para Educación",
+                provider: "Figma",
+                description: "La herramienta líder a nivel mundial en diseño de interfaces de usuario (UI), experiencia de usuario (UX) y prototipado colaborativo es completamente gratuita para estudiantes.\n\nAl verificar tu correo .edu.co, obtendrás una actualización automática al Plan Profesional de Figma (que normalmente cuesta 12 dólares mensuales) sin ningún costo. Esto te permite tener proyectos ilimitados, historial de versiones infinito y bibliotecas de equipo privadas.\n\nIdeal para trabajos en grupo, diseño de software y presentaciones interactivas.",
+                url: "https://www.figma.com/education/",
+                color: "bg-[#f43f5e]", 
+                textColor: "text-white",
+                emoji: "🖌️",
+                animClass: "animate-emoji-1"
+            },
+            {
+                id: 17,
+                shortTitle: "MUBI",
+                subTitle: "Cine con 60% Dcto",
+                title: "MUBI Estudiantes",
+                provider: "MUBI",
+                description: "Para los amantes del séptimo arte y estudiantes de comunicación o audiovisuales, MUBI es una plataforma de streaming curada que ofrece películas independientes, de culto, clásicas y galardonadas en festivales de todo el mundo.\n\nComo estudiante universitario, puedes acceder a su plan especial con un descuento superior al 60%. Pagarás una tarifa muy reducida para disfrutar de una cartelera que cambia constantemente, sin anuncios y con la posibilidad de descargar películas para ver offline.\n\nLa suscripción requiere confirmar tu correo institucional.",
+                url: "https://mubi.com/es/student",
+                color: "bg-[#312e81]", 
+                textColor: "text-white",
+                emoji: "🎬",
+                animClass: "animate-emoji-2"
+            },
+            {
+                id: 18,
+                shortTitle: "Tableau",
+                subTitle: "Licencia Gratis",
+                title: "Tableau for Students",
+                provider: "Salesforce",
+                description: "El análisis de datos es una de las habilidades más demandadas en el mercado laboral. Tableau, la herramienta líder mundial en inteligencia de negocios (Business Intelligence), ofrece su versión Desktop profesional y material de e-learning completamente gratis por un año para estudiantes universitarios.\n\nEste beneficio es renovable mientras sigas estudiando, te ahorra cientos de dólares anuales y te permite crear visualizaciones y dashboards interactivos e impactantes para tus trabajos, investigaciones o tesis de grado.\n\nSolo necesitas validar tu estado académico con tu correo .edu.co.",
+                url: "https://www.tableau.com/academic/students",
+                color: "bg-[#0f172a]", 
+                textColor: "text-white",
+                emoji: "📈",
+                animClass: "animate-emoji-3"
+            },
+            {
+                id: 19,
+                shortTitle: "JetBrains",
+                subTitle: "Licencias Gratis",
+                title: "Pack JetBrains",
+                provider: "JetBrains",
+                description: "Si ves materias de programación o estudias alguna ingeniería afín a la tecnología, esta es una herramienta obligatoria. JetBrains ofrece acceso gratuito a todos sus entornos de desarrollo (IDE) profesionales, como IntelliJ IDEA (Java), PyCharm (Python) y WebStorm (JavaScript).\n\nEstas licencias profesionales cuestan normalmente cientos de dólares al año, pero son 100% gratuitas mientras estés matriculado en la universidad.\n\nRegístrate con tu correo .edu.co y renueva tu acceso cada año sin costo.",
+                url: "https://www.jetbrains.com/community/education/",
+                color: "bg-[#27272a]", 
+                textColor: "text-white",
+                emoji: "👨‍💻",
+                animClass: "animate-emoji-2"
+            }
         ];
 
         const Ticket = ({ data, onClick }) => {
@@ -276,12 +510,9 @@
                     
                     <div 
                         ref={ticketRef}
-                        className={`relative h-full w-full ${data.color} ${data.textColor} rounded-2xl flex overflow-hidden ticket-shape transition-transform duration-200 ease-out z-10`}
+                        className={`relative h-full w-full ${data.color} ${data.textColor} rounded-2xl flex overflow-hidden ticket-shape border-2 border-white/20 transition-transform duration-200 ease-out z-10`}
                         style={{ transform: transformStyle }}
                     >
-                        {/* Borde brillante sutil interno */}
-                        <div className="absolute inset-0 border-2 border-white/20 rounded-2xl pointer-events-none z-20"></div>
-
                         <div 
                             className="absolute inset-0 pointer-events-none transition-opacity duration-300 z-30 mix-blend-overlay"
                             style={{
@@ -326,6 +557,7 @@
                         className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl transform transition-all animate-[fadeIn_0.3s_ease-out]"
                         onClick={e => e.stopPropagation()}
                     >
+                        {/* ENCABEZADO (Fijo arriba) */}
                         <div className={`flex-shrink-0 p-5 sm:p-6 ${ticket.color} ${ticket.textColor} relative ticket-pattern rounded-t-2xl`}>
                             <button onClick={onClose} className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-black/20 hover:bg-black/40 text-white rounded-full p-1.5 transition-colors z-20">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -338,6 +570,7 @@
                             </div>
                         </div>
 
+                        {/* CUERPO (Con scroll independiente) */}
                         <div className="p-5 sm:p-7 overflow-y-auto modal-scroll flex-grow relative bg-white">
                             <div className="text-gray-700 leading-relaxed text-sm sm:text-base space-y-4">
                                 {ticket.description.split('\n').map((paragraph, idx) => (
@@ -353,6 +586,7 @@
                             </div>
                         </div>
 
+                        {/* PIE DE PÁGINA (Fijo abajo con el CTA) */}
                         <div className="p-4 sm:p-5 bg-gray-50 border-t border-gray-100 flex-shrink-0 rounded-b-2xl">
                             <a 
                                 href={ticket.url} target="_blank" rel="noopener noreferrer"
